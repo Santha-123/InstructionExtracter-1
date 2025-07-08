@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Instruction Extractor</title>
+</head>
+<body>
+    <h2>Upload .docx File</h2>
+    <form id="uploadForm">
+        <input type="file" id="fileInput" name="file" accept=".docx" required />
+        <button type="submit">Upload</button>
+    </form>
+
+    <div id="result" style="margin-top:20px;"></div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const resultDiv = document.getElementById('result');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/api/instructions/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Upload failed');
+                }
+
+                const data = await response.json();
+                resultDiv.innerHTML = `
+                    <p><strong>Header:</strong> ${data.header}</p>
+                    <p><strong>Deadline:</strong> ${data.deadline}</p>
+                `;
+            } catch (err) {
+                resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
